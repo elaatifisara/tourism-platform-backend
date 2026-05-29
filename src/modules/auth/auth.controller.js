@@ -12,7 +12,16 @@ const TwoFactorAuth = require('../../utils/twoFactorAuth');
 const EmailService = require('../../utils/emailService');
 const User = require('../users/user.model');
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const getTwilioClient = () => {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  if (!accountSid || !authToken) {
+    return null;
+  }
+
+  return twilio(accountSid, authToken);
+};
 
 class AuthController {
   /**
@@ -210,6 +219,13 @@ class AuthController {
 
       // Si 2FA activée, envoyer code et retourner temp token
       if (user.twoFactorEnabled) {
+        const twilioClient = getTwilioClient();
+        if (!twilioClient) {
+          return res.status(503).json({
+            error: 'Service SMS indisponible. Configurez Twilio pour utiliser le 2FA.'
+          });
+        }
+
         const otpCode = TwoFactorAuth.generateOTP();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -218,7 +234,7 @@ class AuthController {
 
         // Envoyer SMS via Twilio
         try {
-          await client.messages.create({
+          await twilioClient.messages.create({
             body: `Votre code de vérification TravEasy: ${otpCode}. Valide 10 minutes.`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: user.phone
@@ -308,6 +324,13 @@ class AuthController {
    */
   static async send2FACode(req, res) {
     try {
+      const twilioClient = getTwilioClient();
+      if (!twilioClient) {
+        return res.status(503).json({
+          error: 'Service SMS indisponible. Configurez Twilio pour utiliser le 2FA.'
+        });
+      }
+
       const userId = req.user?.userId;
       const ipAddress = req.ip || req.connection.remoteAddress;
 
@@ -328,7 +351,7 @@ class AuthController {
 
       // Envoyer SMS
       try {
-        await client.messages.create({
+        await twilioClient.messages.create({
           body: `Votre code de vérification TravEasy: ${otpCode}. Valide 10 minutes.`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: user.phone
@@ -540,6 +563,13 @@ class AuthController {
    */
   static async enable2FA(req, res) {
     try {
+      const twilioClient = getTwilioClient();
+      if (!twilioClient) {
+        return res.status(503).json({
+          error: 'Service SMS indisponible. Configurez Twilio pour activer le 2FA.'
+        });
+      }
+
       const userId = req.user?.userId;
       const { phone } = req.body;
       const ipAddress = req.ip || req.connection.remoteAddress;
@@ -568,7 +598,7 @@ class AuthController {
 
       // Envoyer SMS de confirmation
       try {
-        await client.messages.create({
+        await twilioClient.messages.create({
           body: `Votre code de confirmation 2FA TravEasy: ${otpCode}. Valide 10 minutes.`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: phone

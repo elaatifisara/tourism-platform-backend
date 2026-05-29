@@ -1,0 +1,39 @@
+# Database Configuration
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=1234
+DB_NAME=tourism_platform
+DB_PORT=3306
+
+# Server Configuration
+NODE_ENV=development
+PORT=3000
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRES_IN=7d
+
+# Email Configuration (SendGrid)
+SENDGRID_API_KEY=your_sendgrid_api_key
+SENDGRID_FROM_EMAIL=noreply@tourismplatform.com
+
+# SMS Configuration (Twilio)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+
+# Payment Gateways
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+CMI_MERCHANT_ID=your_cmi_merchant_id
+CMI_API_KEY=your_cmi_api_key
+
+# Google Maps API
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
+# Frontend URL
+FRONTEND_URL=http://localhost:3001
+
+# File Upload
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=5242880
